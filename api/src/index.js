@@ -27,7 +27,7 @@ app.post('/matricula', async (req, resp) => {
         if(consulta != null) {
             resp.send({erro: '😀 Aluno já cadastrado!'})
         } else {
-            if(nome == "" && nome.length < 2 || numero <= 0 || curso == "" && curso.length < 2 || turma == "" && nome.length <= 0 )
+            if(nome == "" && nome.length < 5 || numero == "" &&  numero <= 0 || curso == "" && curso.length < 5 || turma == "" && turma.length <= 3 )
             {
                 resp.send({erro: '❌ Campos inválidos!'})
             } else {
@@ -41,7 +41,7 @@ app.post('/matricula', async (req, resp) => {
             }
         }
     } catch (e) {
-        resp.send({ erro: 'Os campos "Preços", "Avaliação" e "Estoque" tem que conter apenas números!' })
+        resp.send({ erro: 'O campo "Chamada" só pode conter números positivos!' })
     }
 }) 
 
