@@ -1,8 +1,6 @@
 import db from './bd.js';
 import cors from 'cors'
 import express from 'express'
-import Sequelize from 'sequelize';
-const Op = Sequelize.Op;
 
 const app = express();
 app.use(cors());
@@ -10,41 +8,34 @@ app.use(express.json());
 
 
 
-app.get('/produto', async (req, resp) => {
+app.get('/matricula', async (req, resp) => {
     try {
-        let l = await db.tb_produto.findAll({order: [['id_produto', 'desc']]});
+        let l = await db.tb_matricula.findAll({order: [['id_matricula', 'desc']]});
         resp.send(l);
     } catch (e) {
-        resp.send({ erro: 'Deu erro no GET!' })
+        resp.send({ erro: e.toString() })
     }
 }) 
 
 
-app.post('/produto', async (req, resp) => {
+app.post('/matricula', async (req, resp) => {
     try {
-        let { nome, categoria, precode, precopor, avaliacao, descricao, estoque, imagem } = req.body;
+        let { nome, numero, curso, turma } = req.body;
 
-        let consulta = await db.tb_produto.findOne({where: {nm_produto: nome}});
+        let consulta = await db.tb_matricula.findOne({where: {nm_aluno: nome}});
         
         if(consulta != null) {
-            resp.send({erro: '😀 Produto já cadastrado!'})
+            resp.send({erro: '😀 Aluno já cadastrado!'})
         } else {
-
-            if(nome == "" || categoria == "" || precode <= 0 || precopor <= 0 || avaliacao <= 0 || descricao == "" || estoque < 0 || imagem == "" )
+            if(nome == "" && nome.length < 2 || numero <= 0 || curso == "" && curso.length < 2 || turma == "" && nome.length <= 0 )
             {
                 resp.send({erro: '❌ Campos inválidos!'})
             } else {
-                let i = await db.tb_produto.create({ 
-                    nm_produto: nome, 
-                    ds_categoria: categoria, 
-                    vl_preco_de: precode,
-                    vl_preco_por: precopor,
-                    vl_avaliacao: avaliacao, 
-                    ds_produto: descricao,
-                    qtd_estoque: estoque,
-                    img_produto: imagem,
-                    bt_ativo: true,
-                    dt_inclusao: new Date()
+                let i = await db.tb_matricula.create({ 
+                    nm_aluno: nome,
+                    nr_chamada: numero,
+                    nm_curso: curso,
+                    nm_turma: turma
                 })
                 resp.send(i)    
             }
@@ -55,112 +46,43 @@ app.post('/produto', async (req, resp) => {
 }) 
 
 
-app.put('/produto/:id', async (req, resp) => {
+app.put('/matricula/:id', async (req, resp) => {
     try {
-        let { nome, categoria, precode, precopor, avaliacao, descricao, estoque, imagem } = req.body;
+        let { nome, numero, curso, turma } = req.body;
         let { id } = req.params;
 
-        if(nome == "" && nome.length < 2 || categoria == "" && categoria.length < 2 || precode <= 0 || precopor <= 0 || avaliacao <= 0 || descricao == "" && descricao.length < 2 || estoque <= 0 || imagem == "" && imagem.length < 2 ) {
+        if(nome == "" && nome.length < 2 || numero <= 0 || curso == "" && curso.length < 2 || turma == "" && nome.length <= 0 ) {
             resp.send({erro: '❌ Campos inválidos!'})
         } else {
-                let i = await db.tb_produto.update(
+                let i = await db.tb_matricula.update(
                 {
-                    nm_produto: nome, 
-                    ds_categoria: categoria, 
-                    vl_preco_de: precode,
-                    vl_preco_por: precopor,
-                    vl_avaliacao: avaliacao, 
-                    ds_produto: descricao,
-                    qtd_estoque: estoque,
-                    img_produto: imagem,
+                    nm_aluno: nome,
+                    nr_chamada: numero,
+                    nm_curso: curso,
+                    nm_turma: turma
                 },
                 {
-                    where: {id_produto: id }
+                    where: {id_matricula: id }
                 })
                 resp.sendStatus(200);
             }
     } catch (e) {
-        resp.send({ erro: 'Deu erro no PUT!' })
+        resp.send({ erro: e.toString() })
     }
 }) 
 
 
-app.delete('/produto/:id', async (req, resp) => {
+app.delete('/matricula/:id', async (req, resp) => {
     try {
         let {id} = req.params;
 
-        let d = await db.tb_produto.destroy({ where: { id_produto: id }})
+        let d = await db.tb_matricula.destroy({ where: { id_matricula: id }})
         resp.sendStatus(200);
     } catch (e) {
-        resp.send({ erro: 'Deu erro no Delete!' })
+        resp.send({ erro: e.toString() })
     }
 }) 
-
-
-
-
-
-
-
-app.get('/login', async (req, resp) => {
-    try {
-        let l = await db.tb_login.findAll();
-        resp.send(l);
-    } catch (e) {
-        resp.send({ erro: 'Deu erro no GET!' })
-    }
-}) 
-
-
-app.post('/login', async(req, resp) => {
-    try {
-        let { nome, login, senha, img } = req.body;
-
-        let i = await db.tb_login.create({
-            nm_usuario: nome,
-            ds_login: login,
-            ds_senha: senha,
-            img_usuario: img
-        })
-        resp.send(i);
-    } catch(e) {
-        resp.send({erro: 'Erro no POST'})
-    }
-})
-
-
-app.put('/login/:id', async(req, resp) => {
-    try {
-        let { nome, login, senha, img } = req.body;
-        let { id } = req.params;
-
-        let i = await db.tb_login.update({
-            nm_usuario: nome,
-            ds_login: login,
-            ds_senha: senha,
-            img_usuario: img,
-        },
-        {
-            where: {id_usuario: id}
-        })
-        resp.sendStatus(200);
-    } catch(e) {
-        resp.send({erro: e.toString()})
-    }
-})
-
-
-app.delete('/login/:id', async(req, resp) => {
-    try {
-        let {id} = req.params;
-
-        let d = await db.tb_login.destroy({where: {id_usuario: id}})
-        resp.sendStatus(200);
-    } catch(e) {
-        resp.send({erro: e.toString()})
-    }
-})
 
 
 app.listen(process.env.PORT,
-            x => console.log(`Subiu a Api, respeita! ${process.env.PORT}`))
+            x => console.log(`Subiu a Api! ${process.env.PORT}`))
