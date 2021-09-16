@@ -22,15 +22,18 @@ app.post('/matricula', async (req, resp) => {
     try {
         let { nome, numero, curso, turma } = req.body;
 
-        let consulta = await db.tb_matricula.findOne({where: {nm_aluno: nome}});
+        let consulta = await db.tb_matricula.findOne({where: {nm_turma: turma, nr_chamada: numero}});
         
-        if(consulta != null) {
+        if(consulta != null) 
             resp.send({erro: '😀 Aluno já cadastrado!'})
-        } else {
-            if(nome == "" && nome.length < 5 || numero == "" &&  numero <= 0 || curso == "" && curso.length < 5 || turma == "" && turma.length <= 3 )
+
+            if(nome == "" || nome.length < 5 || numero == "" || numero <= 0 || curso == "" || curso.length < 5 || turma == "" || turma.length <= 3 )
             {
                 resp.send({erro: '❌ Campos inválidos!'})
             } else {
+                if(numero <= 0) {
+                    resp.send({erro: 'O campo "Chamada" só pode conter números positivos!'})
+                } else {
                 let i = await db.tb_matricula.create({ 
                     nm_aluno: nome,
                     nr_chamada: numero,
@@ -41,7 +44,7 @@ app.post('/matricula', async (req, resp) => {
             }
         }
     } catch (e) {
-        resp.send({ erro: 'O campo "Chamada" só pode conter números positivos!' })
+        resp.send({ erro: e.toString() })
     }
 }) 
 
