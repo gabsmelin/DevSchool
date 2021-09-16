@@ -103,7 +103,7 @@ const Bloco1 = styled.div`
 
     button:hover {
         background-color: #986CDF;
-      }
+    }
 
 
 
