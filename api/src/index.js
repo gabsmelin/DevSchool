@@ -54,7 +54,7 @@ app.put('/matricula/:id', async (req, resp) => {
         let { nome, numero, curso, turma } = req.body;
         let { id } = req.params;
 
-        if(nome == "" && nome.length < 2 || numero <= 0 || curso == "" && curso.length < 2 || turma == "" && nome.length <= 0 ) {
+        if(nome == "" && nome.length < 2 || numero <= 0 || curso == "" && curso.length < 2 || turma == "" && turma.length <= 0 ) {
             resp.send({erro: '❌ Campos inválidos!'})
         } else {
                 let i = await db.tb_matricula.update(
